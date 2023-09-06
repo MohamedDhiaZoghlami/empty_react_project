@@ -42,6 +42,7 @@ const Home = () => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [title, setTitle] = useState("");
+  const [mpro, setMpro] = useState(false);
 
   const handleProjectName = (e) => {
     e.preventDefault();
@@ -93,13 +94,42 @@ const Home = () => {
           </div>
         </div>
       )}
+      {mpro && (
+        <div className="uploadWrapper">
+          <div className="parents">
+            <table>
+              <AiOutlineClose
+                className="iconCs"
+                onClick={() => setMpro(false)}
+              />
+              <tr>
+                <th
+                  colSpan={2}
+                  style={{
+                    textAlign: "left",
+                    borderRight: "1px solid #b5b5b5",
+                  }}
+                >
+                  Recent Documents
+                </th>
+              </tr>
+              {data.map((e) => (
+                <tr>
+                  <td>{e.id}</td>
+                  <td>{e.result}</td>
+                </tr>
+              ))}
+            </table>
+          </div>
+        </div>
+      )}
       <div className="leftBox">
         <div className="LtopLevel">
           <img src={Logo} alt="logo" />
           <h3>Fraud Detection Logiciel</h3>
         </div>
         <div className="LbottomLevel">
-          <div className="btnPro">
+          <div className="btnPro" onClick={() => setMpro(true)}>
             Project <RxCountdownTimer className="iconBtn" />
           </div>
         </div>
@@ -113,6 +143,17 @@ const Home = () => {
               <BsFolder2Open className="iconF" />
             </div>
           </div>
+          {fileName && (
+            <p
+              style={{
+                marginBottom: "20px",
+                marginLeft: "20px",
+                fontWeight: "700",
+              }}
+            >
+              {fileName}
+            </p>
+          )}
           <div className="btnWrapper">
             <div className="btnUpload" onClick={() => setModal(true)}>
               Upload
