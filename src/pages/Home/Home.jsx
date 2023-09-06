@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Home.scss";
 import Logo from "../../assets/logo.png";
 import { RxCountdownTimer } from "react-icons/rx";
@@ -6,44 +6,59 @@ import { BsFolder2Open } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 import UploadImg from "../../assets/upload.png";
 import s3 from "../../utils/aws-config";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const data = [
-  {
-    id: 1,
-    result: "dzovi rules",
-  },
-  {
-    id: 2,
-    result: "dzovi rules",
-  },
-  {
-    id: 3,
-    result: "dzovi rules",
-  },
-  {
-    id: 4,
-    result: "dzovi rules",
-  },
-  {
-    id: 5,
-    result: "dzovi rules",
-  },
-  {
-    id: 6,
-    result: "dzovi rules",
-  },
-  {
-    id: 7,
-    result: "dzovi rules",
-  },
-];
 const Home = () => {
+  const navigate = useNavigate();
   const [modal, setModal] = useState(false);
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [title, setTitle] = useState("");
   const [mpro, setMpro] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [projects, setProjects] = useState([]);
 
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+  useEffect(() => {
+    const newSocket = new WebSocket("ws://192.168.1.12/ws");
+
+    newSocket.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    newSocket.onmessage = (event) => {
+      console.log("Received message:", event.data);
+      let x = event.data.replace(/'/g, '"');
+      setMessages((prev) => [...prev, JSON.parse(x)]);
+    };
+
+    newSocket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    setSocket(newSocket);
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      if (newSocket) {
+        newSocket.close();
+      }
+    };
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const result = await axios.get("http://192.168.1.12:80/project_names");
+      console.log(result);
+      setProjects(result.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   const handleProjectName = (e) => {
     e.preventDefault();
     console.log(e.target.value);
@@ -60,21 +75,21 @@ const Home = () => {
   const submitForm = async (e) => {
     e.preventDefault();
     console.log(file, "ss", title);
-    // if (!file) return;
+    if (!file) return;
 
-    // const params = {
-    //   Bucket: "code-sources",
-    //   Key: `${title}/${file[0].name}`,
-    //   Body: file[0],
-    // };
+    const params = {
+      Bucket: "code-sources",
+      Key: `${title}/${file[0].name}`,
+      Body: file[0],
+    };
 
-    // s3.upload(params, (err, data) => {
-    //   if (err) {
-    //     console.error("Error uploading file:", err);
-    //   } else {
-    //     console.log("File uploaded successfully:", data.Location);
-    //   }
-    // });
+    s3.upload(params, (err, data) => {
+      if (err) {
+        console.error("Error uploading file:", err);
+      } else {
+        console.log("File uploaded successfully:", data.Location);
+      }
+    });
   };
   return (
     <div className="filesWrapper">
@@ -113,10 +128,13 @@ const Home = () => {
                   Recent Documents
                 </th>
               </tr>
-              {data.map((e) => (
-                <tr>
-                  <td>{e.id}</td>
-                  <td>{e.result}</td>
+              {projects.map((e, i) => (
+                <tr
+                  onClick={() => navigate(`${e}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <td>{i + 1}</td>
+                  <td>{e}</td>
                 </tr>
               ))}
             </table>
@@ -130,7 +148,7 @@ const Home = () => {
         </div>
         <div className="LbottomLevel">
           <div className="btnPro" onClick={() => setMpro(true)}>
-            Project <RxCountdownTimer className="iconBtn" />
+            Projects <RxCountdownTimer className="iconBtn" />
           </div>
         </div>
       </div>
@@ -167,12 +185,20 @@ const Home = () => {
           <table>
             <tr>
               <th>ID</th>
+              <th>Project Name</th>
+              <th>File Name</th>
               <th>Result</th>
             </tr>
-            {data.map((e) => (
+            {messages.map((e) => (
               <tr>
                 <td>{e.id}</td>
-                <td>{e.result}</td>
+                <td>{e.project_name}</td>
+                <td>{e.filename}</td>
+                {e.CLASS === "NON FRAUD" ? (
+                  <td style={{ color: "green" }}>{e.CLASS}</td>
+                ) : (
+                  <td style={{ color: "red" }}>{e.CLASS}</td>
+                )}
               </tr>
             ))}
           </table>

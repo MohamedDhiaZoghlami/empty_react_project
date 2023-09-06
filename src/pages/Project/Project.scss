@@ -245,9 +245,10 @@
   cursor: pointer;
 }
 .RbottomLevel {
-  margin-top: 50px;
-  max-height: 390px;
+  max-height: 550px;
   overflow-y: scroll;
+  width: 1000px;
+  overflow-x: scroll;
   /* CSS for the table */
   table {
     width: 100%;
@@ -288,11 +289,13 @@
     color: black;
     padding: 10px;
     text-align: center;
+    font-size: 12px;
   }
 
   /* CSS for table cells */
   td {
     padding: 8px;
+    text-align: center;
   }
 
   /* CSS for even rows */
@@ -310,6 +313,7 @@
 /* Target the scrollbar for the .RbottomLevel */
 .RbottomLevel::-webkit-scrollbar {
   width: 1px; /* Set the width of the scrollbar */
+  height: 2px;
 }
 
 /* Track (the background of the scrollbar) for the .RbottomLevel */

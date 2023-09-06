@@ -1,20 +1,16 @@
-import FileUpload from "./pages/FileUpload/FileUpload";
 import Home from "./pages/Home/Home";
-import RealTime from "./pages/RealTime/RealTime";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import Project from "./pages/Project/Project";
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/files" element={<Home />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/:name" element={<Project />} />
         </Routes>
       </BrowserRouter>
-      {/* <div className="dzovi">
-        <FileUpload />
-        <RealTime />
-      </div> */}
     </div>
   );
 }

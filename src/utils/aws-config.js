@@ -7,7 +7,7 @@ AWS.config.update({
   region: "eu-west-1",
   s3ForcePathStyle: true,
   s3BucketEndpoint: false,
-  endpoint: "https://scorpion-modest-robin.ngrok-free.app",
+  endpoint: "http://192.168.1.12:9000",
 });
 
 const s3 = new AWS.S3();
